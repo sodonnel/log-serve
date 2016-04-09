@@ -1,0 +1,16 @@
+* Boot the application by passing a log file and specifying a port
+
+* If you skip to a date, you should be able to scoll earlier and later in the file
+* Need to drop the earliest records in the file as you scroll through it
+* If you can scroll earlier in the file, need to drop later records as you scroll back
+
+These 3 ^^^ are almost the same feature - ie the infinite scroll should go back and forwards, dropping records as it goes, probably in blocks
+
+* Handle aliased files but detecting that lines don't start with a datestamp, or from the log reader
+
+* Use a stats index on a logfile to skip to positions faster. Build the index with log-merge when merging, or as a startup option?
+
+* Show toggle list of log levels - what happens to the scroll position if all the records get filtered out?
+* Show toggle list of aliases    - what happens to the scroll position if all the records get filtered out?
+
+* Apply filters to the file - where do you reset the position to if you start filtering?
