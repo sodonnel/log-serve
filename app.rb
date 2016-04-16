@@ -89,6 +89,17 @@ end
 
 ## End Helpers
 
+def open_resources_at_position(f, index, pos=0)
+  @fh = File.open(f, 'r')
+  @fh.seek(pos, IO::SEEK_SET)
+  @lr = LogMerge::LogReader.new(@fh)
+  @lr.index = index
+end
+
+def close_resources
+  @fh.close
+  @lr = nil
+end
 
 
 
@@ -99,51 +110,46 @@ end
 # TODO - this is slow - 300MB log file, searching to the end takes 45seconds. Need to use
 #         an index to select a starting position.
 post '/gotodate' do
-  date_string = params['datetime']
-  
-  # TODO - exception handling!?!
-  dtm = DateTime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+  begin
+    date_string = params['datetime']
+    open_resources_at_position($logfile, $logfile_index, 0)
+    # TODO - exception handling!?!
+    dtm = DateTime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+    @lr.skip_to_time(dtm)
+    new_position = @lr.io_position
 
-  fh = File.open($logfile, 'r')
-  lr = LogMerge::LogReader.new(fh)
-  lr.skip_to_time(dtm)
-  new_position = lr.io_position
-
-  # check to see if the current line is nil - if it is, then the requested date
-  # is after the last date in the file
-  past_eof = lr.next.nil? ? true : false
-
-  fh.close
-  erb :gotodate, :locals => { :new_position => new_position, :date_not_present => past_eof}
+    # check to see if the current line is nil - if it is, then the requested date
+    # is after the last date in the file
+    past_eof = @lr.next.nil? ? true : false
+    erb :gotodate, :locals => { :new_position => new_position, :date_not_present => past_eof}
+  ensure
+    close_resources
+  end
 end
 
 
 get '/loglines' do
+  begin
+    log_position = params['position'].to_i || 0
+    eof = false
+    open_resources_at_position($logfile, $logfile_index, log_position)
 
-  log_position = params['position'].to_i || 0
-  eof = false
-
-  fh = File.open($logfile, 'r')
-  fh.seek(log_position, IO::SEEK_SET)
-  
-  lr = LogMerge::LogReader.new(fh)
-  
-  str = ''
-  lines = []
-  1.upto(350) do |i|
-    line = lr.next
-    if line
-      lines.push line
-    else
-      eof = true
-      break
+    str = ''
+    lines = []
+    1.upto(350) do |i|
+      line = @lr.next
+      if line
+        lines.push line
+      else
+        eof = true
+        break
+      end
     end
+    str << erb(:logline, :locals => { :lines => lines })
+    new_position = @lr.io_position
+    
+    erb :more, :locals => { :log_data => str, :log_position => new_position.to_s, :no_more_messages => eof }
+  ensure
+    close_resources
   end
-  str << erb(:logline, :locals => { :lines => lines })
-  new_position = lr.io_position
-
-  fh.close
-
-  erb :more, :locals => { :log_data => str, :log_position => new_position.to_s, :no_more_messages => eof }
-
 end
