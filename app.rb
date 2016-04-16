@@ -2,13 +2,69 @@ $:.unshift File.expand_path(File.join(File.dirname(__FILE__), "../log-merge", "l
 $:.unshift File.expand_path(File.dirname(__FILE__))
 
 
-require 'sinatra'
 require 'log-merge'
 
-filename = '/Users/sodonnell/Desktop/merge_logs/zookeeper-cmf-zookeeper1-SERVER-dc5b01.bell.corp.bce.ca.txt'
-#filename = '/Users/sodonnell/Desktop/merge_logs/1000_lines.txt'
+# filename = '/Users/sodonnell/Desktop/merge_logs/zookeeper-cmf-zookeeper1-SERVER-dc5b01.bell.corp.bce.ca.txt'
+# filename = '/Users/sodonnell/Desktop/merge_logs/1000_lines.txt'
+$logfile = nil
+$logfile_index_filename = nil
+$logfile_index = nil
 
 
+opts = OptionParser.new do |opts|
+  opts.on("-f", "--file FILE", "Path to the log file to serve") do |f|
+    unless File.exist?(f)
+      puts "Requested file #{f} does not exist"
+      exit(1)
+    end
+    $logfile = f
+  end
+  opts.on("-i", "--index FILE", "Index associated with the log file to serve") do |f|
+    unless File.exist?(f)
+      puts "Requested index #{f} does not exist"
+      exit(1)
+    end
+    begin
+      $logfile_index = LogMerge::Index.new
+      $logfile_index.load(f)
+    rescue =>  e
+      puts "Failed to load the index - are you sure it is a valid index?"
+      puts e
+      exit(1)
+    end
+    $logfile_index_filename
+  end
+end
+
+# This needs to run before Sinatra is required, otherwise Sinatra
+# tries to parse the command line options and it does not like them
+opts.parse(ARGV)
+# This will warn about constant initialised, but unless it is cleared
+# sinatra will error with bad command line options. This also means
+# that none of the Sinatra options will work if they are passed now
+ARGV = []
+
+require 'sinatra'
+
+# If no index was passed in, check if there is one named the same as the logfile
+# ending in .index - if so load it.
+if $logfile_index == nil
+  index = "#{$logfile}.index"
+  if File.exists?(index)
+    begin
+      $logfile_index = LogMerge::Index.new
+      $logfile_index.load(index)
+      $logfile_index_filename = index
+    rescue =>  e
+      warn "Attempted to load index #{index} which failed"
+      puts e
+    end
+  end
+end
+
+
+# These are helpers
+# TODO - move to their own file
 JS_ESCAPE_MAP = {
         '\\'    => '\\\\',
         '</'    => '<\/',
@@ -31,6 +87,9 @@ def htmlify_newlines(str)
   str.gsub(/\n/, '<br />')
 end
 
+## End Helpers
+
+
 
 
 get '/' do
@@ -45,7 +104,7 @@ post '/gotodate' do
   # TODO - exception handling!?!
   dtm = DateTime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
 
-  fh = File.open(filename, 'r')
+  fh = File.open($logfile, 'r')
   lr = LogMerge::LogReader.new(fh)
   lr.skip_to_time(dtm)
   new_position = lr.io_position
@@ -64,7 +123,7 @@ get '/loglines' do
   log_position = params['position'].to_i || 0
   eof = false
 
-  fh = File.open(filename, 'r')
+  fh = File.open($logfile, 'r')
   fh.seek(log_position, IO::SEEK_SET)
   
   lr = LogMerge::LogReader.new(fh)
