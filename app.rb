@@ -4,6 +4,8 @@ $:.unshift File.expand_path(File.dirname(__FILE__))
 
 require 'log-merge'
 require_relative 'lib/color_picker'
+require_relative 'lib/helpers'
+
 
 # filename = '/Users/sodonnell/Desktop/merge_logs/zookeeper-cmf-zookeeper1-SERVER-dc5b01.bell.corp.bce.ca.txt'
 # filename = '/Users/sodonnell/Desktop/merge_logs/1000_lines.txt'
@@ -48,6 +50,8 @@ ARGV = []
 
 require 'sinatra'
 
+helpers LogServer::Helpers
+
 # If no index was passed in, check if there is one named the same as the logfile
 # ending in .index - if so load it.
 if $logfile_index == nil
@@ -64,37 +68,6 @@ if $logfile_index == nil
   end
 end
 
-
-# These are helpers
-# TODO - move to their own file
-JS_ESCAPE_MAP = {
-        '\\'    => '\\\\',
-        '</'    => '<\/',
-        "\r\n"  => '\n',
-        "\n"    => '\n',
-        "\r"    => '\n',
-        '"'     => '\\"',
-        "'"     => "\\'"
-}
-
-def escape_javascript(javascript)
-  if javascript
-    result = javascript.gsub(/(\\|<\/|\r\n|\342\200\250|\342\200\251|[\n\r"'])/u) {|match| JS_ESCAPE_MAP[match] }
-  else
-    ''
-  end
-end
-
-def htmlify_newlines(str)
-  str.gsub(/\n/, '<br />')
-end
-
-def pick_alias_color(str)
-  $alias_color_picker.get_color(str)
-end
-    
-
-## End Helpers
 
 def open_resources_at_position(f, index, pos=0)
   @fh = File.open(f, 'r')
