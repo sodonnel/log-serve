@@ -3,12 +3,14 @@ $:.unshift File.expand_path(File.dirname(__FILE__))
 
 
 require 'log-merge'
+require_relative 'lib/color_picker'
 
 # filename = '/Users/sodonnell/Desktop/merge_logs/zookeeper-cmf-zookeeper1-SERVER-dc5b01.bell.corp.bce.ca.txt'
 # filename = '/Users/sodonnell/Desktop/merge_logs/1000_lines.txt'
 $logfile = nil
 $logfile_index_filename = nil
 $logfile_index = nil
+$alias_color_picker = ColorPicker.new
 
 
 opts = OptionParser.new do |opts|
@@ -86,6 +88,11 @@ end
 def htmlify_newlines(str)
   str.gsub(/\n/, '<br />')
 end
+
+def pick_alias_color(str)
+  $alias_color_picker.get_color(str)
+end
+    
 
 ## End Helpers
 
