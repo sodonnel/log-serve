@@ -15,6 +15,7 @@ require_relative 'app/routes/picker'
 require_relative 'app/routes/viewer'
 
 require_relative 'app/models/log_file'
+require_relative 'app/models/log_directory'
 
 module LogServe
   
@@ -30,6 +31,8 @@ module LogServe
     
     use Routes::Picker
     use Routes::Viewer
+
+    $log_directory = LogServe::Models::LogDirectory.new('/Users/sodonnell/Desktop/logs').load_files
   end
 
 end

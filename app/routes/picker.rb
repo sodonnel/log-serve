@@ -5,7 +5,7 @@ module LogServe
       set :views, 'app/views'
 
       get '/picker' do
-        erb :picker
+        erb :picker, :locals => { :directory => $log_directory }
       end
       
     end

@@ -1,18 +1,24 @@
+require 'digest'
+
 module LogServe
   module Models
     class LogFile
 
-      attr_reader :last_io_position
+      attr_reader :key, :last_io_position
 
-      def initialize(file_path, index)
+      def initialize(file_path)
         @file_path = file_path
-        @index     = index
-        @fh        = File.open(@file_path, 'r')
-        @lr        = LogMerge::LogReader.new(@fh)
-        @lr.index  = index
+        set_key
+#        @index     = index
+#        @lr.index  = index
+      end
+
+      def filename
+        File.basename @file_path
       end
 
       def read_lines_from_position(num_to_read, pos)
+        open
         @fh.seek(pos, IO::SEEK_SET)
         @eof = false
         lines = []
@@ -35,10 +41,24 @@ module LogServe
         @eof
       end
 
+      # TODO - fix this open handler as it does not reopen a closed file
+      #        probably @fh is not nil after it has been closed
+      def open
+        @fh ||= File.open(@file_path, 'r')
+        @lr ||= LogMerge::LogReader.new(@fh)
+      end
+
       def close
-        @fh.close
-        @index = nil
+        if @fh
+          @fh.close
+        end
         @lr    = nil
+      end
+
+      private
+
+      def set_key
+        @key = Digest::MD5.hexdigest @file_path
       end
       
     end

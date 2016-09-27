@@ -17,7 +17,8 @@ function load_log_lines() {
     }
     $('#container').attr("data-infinite-scroll-status", "loading");
     var position = $('#container').attr("data-infinite-scroll-position")
-    $.get("/loglines?position="+position, function(response) {
+    var filekey  = $('#container').attr("data-filekey")
+    $.get("/loglines/"+filekey+"/"+position, function(response) {
 	eval(response)
 //	$('#container').attr('data-infinite-scroll-status', 'ready');
     }).fail(function() {
