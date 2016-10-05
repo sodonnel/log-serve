@@ -1,7 +1,8 @@
 // Goto Date form
 jQuery(function($) {
     $("#gotoDate").submit(function( event ) {
-	$.post("/gotodate", $("#gotoDate").serialize(), function(response) {
+	var filekey  = $('#container').attr("data-filekey")
+	$.post("/gotodate/"+filekey, $("#gotoDate").serialize(), function(response) {
 	    eval(response);
 	}).fail(function() {
 	    alert( "Failed to goto the date - server error" );
@@ -20,7 +21,6 @@ function load_log_lines() {
     var filekey  = $('#container').attr("data-filekey")
     $.get("/loglines/"+filekey+"/"+position, function(response) {
 	eval(response)
-//	$('#container').attr('data-infinite-scroll-status', 'ready');
     }).fail(function() {
 	alert( "Failed to retrieve logs - server error" );
 	$('#container').attr('data-infinite-scroll-status', 'ready');
@@ -47,11 +47,28 @@ jQuery(function($) {
 
 // Infinite scroll on the articles and subsciption pages
 // To trigger the scroll earlier, make the 3000 below bigger.
+//jQuery(function($) {
+//    $(window).scroll(function() {
+//    if ( ($(window).scrollTop() >= $(document).height() - $(window).height() - 3000)
+//         && ($('#container').attr("data-infinite-scroll-status") == 'ready') ) {
+//	load_log_lines();
+//    }
+//  })
+//});
+
+
 jQuery(function($) {
-  $(window).scroll(function() {
-    if ( ($(window).scrollTop() >= $(document).height() - $(window).height() - 3000)
-         && ($('#container').attr("data-infinite-scroll-status") == 'ready') ) {
-	load_log_lines();
-    }
-  })
+    $(window).bind('DOMMouseScroll mousewheel', function(e){
+	if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
+	    console.log('up!');
+	}
+	else {
+	    // scrolling down
+	    if ( ( ($(window).scrollTop() >= $(document).height() - $(window).height() - 3000)
+		   || ($(document).height() <= $(window).height()))
+		 && ($('#container').attr("data-infinite-scroll-status") == 'ready') ) {
+		load_log_lines();
+	    }
+	}
+  });
 });

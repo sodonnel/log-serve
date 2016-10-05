@@ -15,7 +15,10 @@ require_relative 'app/routes/picker'
 require_relative 'app/routes/viewer'
 
 require_relative 'app/models/log_file'
+require_relative 'app/models/log_file_line'
 require_relative 'app/models/log_directory'
+
+puts 'loaded libs'
 
 module LogServe
   

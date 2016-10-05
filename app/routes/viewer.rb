@@ -11,19 +11,35 @@ module LogServe
       
       set :views, 'app/views'
 
-      get '/viewer/:filekey/?' do
-        erb :viewer, :locals => { :filekey => params['filekey'] }
+      get '/viewer/:filekey/?:position?' do
+        log_position = params['position'].to_i || 0
+        erb :viewer, :locals => { :position => log_position, :filekey => params['filekey'] }
       end
 
       get '/loglines/:filekey/?:position?' do
         begin
           log_position = params['position'].to_i || 0
           log_file = $log_directory.find_file(params[:filekey]) #logServe::Models::LogFile.new($logfile, $logfile_index)
-          lines = log_file.read_lines_from_position(350, log_position)
+          lines = log_file.read_lines_from_position(10, log_position)
                     
           erb :more, :layout => false, :locals => { :lines => lines, :log_position => log_file.last_io_position.to_s, :no_more_messages => log_file.eof? }
         ensure
-          #log_file.close
+          log_file.close
+        end
+      end
+
+      post '/gotodate/:filekey' do
+        begin
+          date_string = params['datetime']
+          warn date_string
+          log_file = $log_directory.find_file(params[:filekey])
+
+          dtm = DateTime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
+          new_position = log_file.position_at_time(dtm)
+          warn new_position
+          #  pp $logfile_index.get_index_hash
+
+          erb :gotodate, :layout => false, :locals => { :new_position => new_position }
         end
       end
 
