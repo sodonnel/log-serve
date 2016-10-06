@@ -1,0 +1,10 @@
+var oldHeight = $(document).height()
+$('#code').prepend('<%= escape_javascript(erb(:logline, :layout => false, :locals => { :lines => lines })) %>');
+$('html, body').scrollTop($('html, body').scrollTop() + $(document).height() - oldHeight);
+
+$('#container').attr('data-infinite-scroll-earlier-position', '<%= log_position %>');
+<% if no_more_messages %>
+  $('#container').attr('data-infinite-scroll-earlier-status', 'end-of-stream');
+<% else %>
+  $('#container').attr('data-infinite-scroll-earlier-status', 'ready');
+<% end %>

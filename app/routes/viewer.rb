@@ -20,12 +20,20 @@ module LogServe
         begin
           log_position = params['position'].to_i || 0
           log_file = $log_directory.find_file(params[:filekey]) #logServe::Models::LogFile.new($logfile, $logfile_index)
-          lines = log_file.read_lines_from_position(10, log_position)
+          lines = log_file.read_lines_from_position(100, log_position)
                     
           erb :more, :layout => false, :locals => { :lines => lines, :log_position => log_file.last_io_position.to_s, :no_more_messages => log_file.eof? }
         ensure
           log_file.close
         end
+      end
+
+      get '/viewer/previouslines/:filekey/?:position?' do
+          log_position = params['position'].to_i || 0
+          log_file = $log_directory.find_file(params[:filekey])
+          lines = log_file.read_lines_backwards_from_position(100, log_position).reverse
+                    
+          erb :previouslines, :layout => false, :locals => { :lines => lines, :log_position => log_file.last_io_position.to_s, :no_more_messages => log_file.eof? }
       end
 
       post '/gotodate/:filekey' do

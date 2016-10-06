@@ -12,18 +12,21 @@ jQuery(function($) {
 });
 
 
-function load_log_lines() {
+function load_log_lines(forwards) {
     if ($('#container').attr("data-infinite-scroll-status")  != 'ready') {
 	return;
     }
-    $('#container').attr("data-infinite-scroll-status", "loading");
-    var position = $('#container').attr("data-infinite-scroll-position")
+    var statusAttr = forwards ? "data-infinite-scroll-status" : "data-infinite-scroll-earlier-status"
+    $('#container').attr(statusAttr, "loading");
     var filekey  = $('#container').attr("data-filekey")
-    $.get("/loglines/"+filekey+"/"+position, function(response) {
+    var position = $('#container').attr(forwards ? "data-infinite-scroll-position" : "data-infinite-scroll-earlier-position")
+    
+    var url = forwards ? "/loglines/" : "/viewer/previouslines/"
+    $.get(url+filekey+"/"+position, function(response) {
 	eval(response)
     }).fail(function() {
 	alert( "Failed to retrieve logs - server error" );
-	$('#container').attr('data-infinite-scroll-status', 'ready');
+	$('#container').attr(statusAttr, 'ready');
     });
 }
 
@@ -32,15 +35,15 @@ function reset_position(new_position) {
     // This method will set the data-infinite-scroll-position, clear the loglines
     // and then call load_log_lines to load new logs
     $('#container').attr('data-infinite-scroll-position', new_position);
+    $('#container').attr('data-infinite-scroll-earlier-position', new_position);
     $('#code').empty();
     load_log_lines();
-    
 }
 
 
 jQuery(function($) {
     $(document).ready(function() {
-	load_log_lines();
+	load_log_lines(true);
     })
 });
 
@@ -60,14 +63,17 @@ jQuery(function($) {
 jQuery(function($) {
     $(window).bind('DOMMouseScroll mousewheel', function(e){
 	if (e.originalEvent.wheelDelta > 0 || e.originalEvent.detail < 0) {
-	    console.log('up!');
+	    if ( ( ($(window).scrollTop() < 3000) || ($(document).height() <= $(window).height()) ) 
+		 && ($('#container').attr("data-infinite-scroll-earlier-status") == 'ready') ) {
+		load_log_lines(false);
+	    }
 	}
 	else {
 	    // scrolling down
 	    if ( ( ($(window).scrollTop() >= $(document).height() - $(window).height() - 3000)
 		   || ($(document).height() <= $(window).height()))
 		 && ($('#container').attr("data-infinite-scroll-status") == 'ready') ) {
-		load_log_lines();
+		load_log_lines(true);
 	    }
 	}
   });
