@@ -55,6 +55,16 @@ module LogServe
         @eof
       end
 
+      def eof_position
+        begin
+          open
+          @fh.seek(0, IO::SEEK_END)
+          @fh.pos
+        ensure
+          close
+        end
+      end
+
       def open(pos=0)
         if @fh.nil? || @fh.closed?
           @fh = File.open(@file_path, 'r')

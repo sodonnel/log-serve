@@ -5,3 +5,14 @@ $('#container').attr('data-infinite-scroll-position', '<%= log_position %>');
 <% else %>
   $('#container').attr('data-infinite-scroll-status', 'ready');
 <% end %>
+
+// TODO - move into function
+if ( $('#code tr').size() > 750 ) {
+  var oldHeight = $(document).height()
+  $('#code tr').slice(0, 250).remove();
+  $('html, body').scrollTop($('html, body').scrollTop() + $(document).height() - oldHeight);
+  $('#container').attr('data-infinite-scroll-earlier-status', 'ready');
+  $('#container').attr('data-infinite-scroll-earlier-position', $('#code tr').first().attr('sp'));
+}
+
+

@@ -11,12 +11,25 @@ jQuery(function($) {
     });
 });
 
+jQuery(function($) {
+    $("#endButton").click(function( event ) {
+	var filekey = $('#container').attr("data-filekey")
+	$.get("/file/"+filekey+"/position/end", function(response) {
+	    eval(response);
+	}).fail(function() {
+	    alert( "Failed to goto the end of the file - server error" );
+	});
+	return false;
+    });
+});
+
 
 function load_log_lines(forwards) {
-    if ($('#container').attr("data-infinite-scroll-status")  != 'ready') {
+    var statusAttr = forwards ? "data-infinite-scroll-status" : "data-infinite-scroll-earlier-status"
+    if ($('#container').attr(statusAttr)  != 'ready' ) {
 	return;
     }
-    var statusAttr = forwards ? "data-infinite-scroll-status" : "data-infinite-scroll-earlier-status"
+
     $('#container').attr(statusAttr, "loading");
     var filekey  = $('#container').attr("data-filekey")
     var position = $('#container').attr(forwards ? "data-infinite-scroll-position" : "data-infinite-scroll-earlier-position")
@@ -36,8 +49,12 @@ function reset_position(new_position) {
     // and then call load_log_lines to load new logs
     $('#container').attr('data-infinite-scroll-position', new_position);
     $('#container').attr('data-infinite-scroll-earlier-position', new_position);
+    $('#container').attr('data-infinite-scroll-status', 'ready');
+    $('#container').attr('data-infinite-scroll-earlier-status', 'ready');
     $('#code').empty();
-    load_log_lines();
+    // Pre load some lines ahead and behind
+    load_log_lines(true);
+    load_log_lines(false);
 }
 
 
