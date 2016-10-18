@@ -36,6 +36,8 @@ module LogServe
     use Routes::Viewer
 
     $log_directory = LogServe::Models::LogDirectory.new('/Users/sodonnell/Desktop/logs').load_files
+    $lines_per_request = 250
+    $lines_maintained_in_viewer = 3 * $lines_per_request
   end
 
 end

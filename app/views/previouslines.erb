@@ -10,7 +10,7 @@ $('#container').attr('data-infinite-scroll-earlier-position', '<%= log_position 
 <% end %>
 
 // TODO - move into function
-if ( $('#code tr').size() > 750 ) {
+if ( $('#code tr').size() > <%= max_lines %> ) {
   var oldHeight = $(document).height()
   $('#code tr').slice(-250).remove();
   $('#container').attr('data-infinite-scroll-status', 'ready');

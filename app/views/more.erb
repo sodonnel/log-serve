@@ -7,7 +7,7 @@ $('#container').attr('data-infinite-scroll-position', '<%= log_position %>');
 <% end %>
 
 // TODO - move into function
-if ( $('#code tr').size() > 750 ) {
+if ( $('#code tr').size() > <%= max_lines %> ) {
   var oldHeight = $(document).height()
   $('#code tr').slice(0, 250).remove();
   $('html, body').scrollTop($('html, body').scrollTop() + $(document).height() - oldHeight);
