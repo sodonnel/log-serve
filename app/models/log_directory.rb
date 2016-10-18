@@ -18,8 +18,11 @@ module LogServe
         self
       end
 
+      # LogFile is not thread safe, so instead of returning the only copy
+      # of it, this method returns a clone that is intended to be used
+      # by a request thread and then thrown away.
       def find_file(key)
-        @files[key]
+        @files[key].clone
       end
 
       def each
