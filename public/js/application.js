@@ -34,8 +34,8 @@ function load_log_lines(forwards) {
     var filekey  = $('#container').attr("data-filekey")
     var position = $('#container').attr(forwards ? "data-infinite-scroll-position" : "data-infinite-scroll-earlier-position")
     
-    var url = forwards ? "/loglines/" : "/viewer/previouslines/"
-    $.get(url+filekey+"/"+position, function(response) {
+    var url = forwards ? "more" : "less"
+    $.get("/file/"+filekey+"/"+url+"/"+position, function(response) {
 	eval(response)
     }).fail(function() {
 	alert( "Failed to retrieve logs - server error" );

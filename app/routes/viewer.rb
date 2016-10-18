@@ -11,42 +11,39 @@ module LogServe
       
       set :views, 'app/views'
 
+      before '/file/:filekey/*' do 
+        @log_file = $log_directory.find_file(params[:filekey])
+      end
+
+
       get '/viewer/:filekey/?:position?' do
         log_position = params['position'].to_i || 0
         erb :viewer, :locals => { :position => log_position, :filekey => params['filekey'] }
       end
 
-      get '/loglines/:filekey/?:position?' do
-        begin
-          log_position = params['position'].to_i || 0
-          log_file = $log_directory.find_file(params[:filekey]) #logServe::Models::LogFile.new($logfile, $logfile_index)
-          lines = log_file.read_lines_from_position($lines_per_request, log_position)
-                    
-          erb :more, :layout => false, :locals => { :lines => lines,
-                                                    :max_lines => $lines_maintained_in_viewer,
-                                                    :log_position => log_file.last_io_position.to_s,
-                                                    :no_more_messages => log_file.eof? }
-        ensure
-          log_file.close
-        end
+      get '/file/:filekey/more/?:position?' do
+        log_position = params['position'].to_i || 0
+        lines = @log_file.read_lines_from_position($lines_per_request, log_position)
+        
+        erb :more, :layout => false, :locals => { :lines => lines,
+                                                  :max_lines => $lines_maintained_in_viewer,
+                                                  :log_position => @log_file.last_io_position.to_s,
+                                                  :no_more_messages => @log_file.eof? }
       end
 
       get '/file/:filekey/position/end' do
-        log_file = $log_directory.find_file(params[:filekey])
-        new_position = log_file.eof_position
-        puts "calling correct one"
+        new_position = @log_file.eof_position
         erb :reset, :layout => false, :locals => { :eof => true, :position => new_position }
       end
 
-      get '/viewer/previouslines/:filekey/?:position?' do
+      get '/file/:filekey/less/?:position?' do
           log_position = params['position'].to_i || 0
-          log_file = $log_directory.find_file(params[:filekey])
-          lines = log_file.read_lines_backwards_from_position($lines_per_request, log_position).reverse
+          lines = @log_file.read_lines_backwards_from_position($lines_per_request, log_position).reverse
                     
           erb :previouslines, :layout => false, :locals => { :lines => lines,
                                                              :max_lines => $lines_maintained_in_viewer,
-                                                             :log_position => log_file.last_io_position.to_s,
-                                                             :no_more_messages => log_file.eof? }
+                                                             :log_position => @log_file.last_io_position.to_s,
+                                                             :no_more_messages => @log_file.eof? }
       end
 
       post '/gotodate/:filekey' do
