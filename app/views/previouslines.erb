@@ -8,3 +8,12 @@ $('#container').attr('data-infinite-scroll-earlier-position', '<%= log_position 
 <% else %>
   $('#container').attr('data-infinite-scroll-earlier-status', 'ready');
 <% end %>
+
+// TODO - move into function
+if ( $('#code tr').size() > 750 ) {
+  var oldHeight = $(document).height()
+  $('#code tr').slice(-250).remove();
+  $('#container').attr('data-infinite-scroll-status', 'ready');
+  $('#container').attr('data-infinite-scroll-position', $('#code tr').last().attr('ep'));
+}
+
