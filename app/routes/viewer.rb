@@ -2,9 +2,6 @@ module LogServe
   module Routes
     class Viewer < Sinatra::Application
 
-      # TODO - alias color picker
-      $alias_color_picker = ColorPicker.new
-      
       set :views, 'app/views'
 
       before '/file/:filekey/*' do 

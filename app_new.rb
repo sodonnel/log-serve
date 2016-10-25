@@ -7,8 +7,6 @@ require 'log-merge'
 require 'rubygems'
 require 'sinatra/base'
 
-require_relative 'lib/color_picker'
-
 require_relative 'app/helpers/global'
 
 require_relative 'app/routes/picker'
