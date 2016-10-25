@@ -2,6 +2,8 @@ module LogServe
   module Models
     class LogDirectory
 
+      attr_reader :path
+
       def initialize(path)
         @path = path
         @files = Hash.new
@@ -12,10 +14,14 @@ module LogServe
       def load_files
         files = Dir.entries(@path).select {|f| !File.directory? f}.select {|f| f !=~ /(\.gz|\.zip|\.logserveidx)$/}
         files.each do |f|
-          lf = LogFile.new(File.join(@path, f))
-          @files[lf.key] = lf
+          add_file(f)
         end
         self
+      end
+
+      def add_file(f)
+        lf = LogFile.new(File.join(@path, f))
+        @files[lf.key] = lf
       end
 
       # LogFile is not thread safe, so instead of returning the only copy

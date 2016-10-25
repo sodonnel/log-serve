@@ -2,10 +2,6 @@ module LogServe
   module Routes
     class Viewer < Sinatra::Application
 
-#      $logfiles = LogServe::Models::LogDirectory.new('/Users/sodonnell/Desktop/logs')
-
-        # '/Users/sodonnell/Desktop/logs/hadoop-cmf-hdfs01-FAILOVERCONTROLLER-frafatahdpappb1.de.db.com.log.out'
-      $logfile_index = nil
       # TODO - alias color picker
       $alias_color_picker = ColorPicker.new
       

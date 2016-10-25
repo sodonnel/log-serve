@@ -1,18 +1,18 @@
 
 <h3>Available Log Files</h3>
 
-<form class="form-inline">
+<form class="form-inline" action="/picker/merge" method="get">
 <table class="table table-bordered">
 
   <tr>
-  <th class="col-md-1" style="vertical-align: middle"><button class="btn btn-primary" type="submit">Merge Selected</button></th>
+  <th class="col-md-1" style="vertical-align: middle"><input type="submit" class="btn btn-primary" value="Merge Selected"></th>
   <th style="vertical-align: middle">File Name</th>
   <th class="col-md-1" style="vertical-align: middle">Action</th>
   </tr>
   <% directory.each do |lf| %>
   <tr>
     <td style="vertical-align: middle">
-      <input type="checkbox" id="check:abc" class="form-control input-sm"> <input type="text" disable size="3" class="form-control" id="alias:abc" placeholder="alias">
+      <input type="checkbox" name="files[]" value="<%= lf.key %>" class="form-control input-sm">
     </td>
     <td style="vertical-align: middle"><%= lf.filename %></td>
     <td style="vertical-align: middle"><a href="/viewer/<%= lf.key %>">view</a> | index</td>

@@ -17,6 +17,7 @@ require_relative 'app/routes/viewer'
 require_relative 'app/models/log_file'
 require_relative 'app/models/log_file_line'
 require_relative 'app/models/log_directory'
+require_relative 'app/models/log_file_merger'
 
 puts 'loaded libs'
 

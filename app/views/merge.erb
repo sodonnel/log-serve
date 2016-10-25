@@ -1,0 +1,26 @@
+<h3>Merge The Following Files</h3>
+
+<form class="form-inline" action="/picker/domerge" method="post">
+<table class="table table-bordered">
+
+  <tr>
+  <th class="col-md-1" style="vertical-align: middle">Alias</th>
+  <th style="vertical-align: middle">File Name</th>
+  </tr>
+  <% files.each do |lf| %>
+  <tr>
+    <td style="vertical-align: middle">
+      <input type="hidden" name="files[]" value="<%= lf.key %>" class="form-control input-sm">	
+      <input type="input" name="aliases[]" value="" class="form-control input-sm" placeholder="Short Alias">
+    </td>
+    <td style="vertical-align: middle"><%= lf.filename %></td>
+  </tr>
+  <% end %>
+  <tr>
+    <td style="vertical-align: middle"><input class="form-control input-sm" type="input" name="merged_filename" placeholder="Merged Filename"></td>
+    <td style="vertical-align: middle"><input class="btn btn-primary" type="submit" value="Merge Files"></td>
+  </tr>
+</table>
+
+</form>
+

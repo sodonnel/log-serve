@@ -4,7 +4,7 @@ module LogServe
   module Models
     class LogFile
 
-      attr_reader :key, :last_io_position
+      attr_reader :key, :last_io_position, :file_path
 
       def initialize(file_path)
         @file_path = file_path
