@@ -37,18 +37,14 @@ module LogServe
           close
         end
       end
-      
+
       def position_at_time(dtm)
-        begin
-          open
-          @lr.skip_to_time(dtm)
-          position = @lr.io_position
-          # Return nil if we are past EOF
-          # or position otherwise
-          @lr.next.nil? ? nil : position
-        ensure
-          close
+        start_line = read_lines_from_position(1, 0).first
+        end_line   = read_lines_backwards_from_position(1, eof_position).first
+        if start_line.timestamp > dtm || end_line.timestamp < dtm
+          return nil
         end
+        search_for_time_internal(dtm, start_line, end_line).start_file_position
       end
 
       def eof?
@@ -134,7 +130,24 @@ module LogServe
 
         lines
       end
-      
+
+      def search_for_time_internal(dtm, start_line, end_line)
+        middle = ((end_line.start_file_position + start_line.start_file_position) / 2).floor
+        middle_line = read_lines_backwards_from_position(1, middle).first
+
+        if ((start_line.start_file_position == middle_line.start_file_position) || (end_line.start_file_position == middle_line.start_file_position))
+          # I don't think the condition on end_line is necessary. The algorithm should converge to two lines and then the middle
+          # will generally fallback to the start line, which should be the line before the time you are asking for.
+          return middle_line
+        end
+
+        if dtm <= middle_line.timestamp
+          search_for_time_internal(dtm, start_line, middle_line)
+        else
+          search_for_time_internal(dtm, middle_line, end_line)
+        end
+      end
+
     end
   end
 end
