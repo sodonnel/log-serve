@@ -28,7 +28,7 @@ module LogServe
       # as single character aliases would not work well with the BKR hash mentioned
       # in that stackoverflow post
       if str
-        val = Digest::MD5.hexdigest(str).to_i(16) % 360
+        val = Digest::MD5.hexdigest(str).to_i(16) % 359
         "hsl(#{val},100%,30%)";
       else
         "black"
