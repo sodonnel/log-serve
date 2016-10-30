@@ -1,9 +1,0 @@
-
-<% lines.each do |line| %>
-<tr style="color: <%= pick_alias_color(line.log_alias) %>;">
-  <td class="nw"><%= line.log_alias %></td>
-  <td class="nw"><%= line.timestamp.strftime('%Y-%m-%d %H:%M:%S,%L') %></td>
-  <td class="nw"><%= line.level %></td>
-  <td><%= htmlify_newlines(line.content) %></td>
-</tr>
-<% end %>

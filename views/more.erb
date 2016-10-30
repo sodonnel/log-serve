@@ -1,7 +1,0 @@
-$('#code').append('<%= escape_javascript(log_data) %>');
-$('#container').attr('data-infinite-scroll-position', '<%= log_position %>');
-<% if no_more_messages %>
-  $('#container').attr('data-infinite-scroll-status', 'end-of-stream');
-<% else %>
-  $('#container').attr('data-infinite-scroll-status', 'ready');
-<% end %>
