@@ -2,7 +2,7 @@ module LogServe
   module Routes
     class Viewer < Sinatra::Application
 
-      set :views, 'app/views'
+      set :views, File.expand_path('../../views', __FILE__)
 
       before '/file/:filekey/*' do 
         @log_file = $log_directory.find_file(params[:filekey])

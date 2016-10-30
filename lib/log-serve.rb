@@ -1,23 +1,20 @@
 $:.unshift File.expand_path(File.dirname(__FILE__))
-$:.unshift File.expand_path(File.join(File.dirname(__FILE__), "../log-merge", "lib"))
-
+$:.unshift File.expand_path(File.join(File.dirname(__FILE__), "../../log-merge", "lib"))
 
 require 'log-merge'
 
 require 'rubygems'
 require 'sinatra/base'
 
-require_relative 'app/helpers/global'
+require_relative 'log-serve/helpers/global'
 
-require_relative 'app/routes/picker'
-require_relative 'app/routes/viewer'
+require_relative 'log-serve/routes/picker'
+require_relative 'log-serve/routes/viewer'
 
-require_relative 'app/models/log_file'
-require_relative 'app/models/log_file_line'
-require_relative 'app/models/log_directory'
-require_relative 'app/models/log_file_merger'
-
-puts 'loaded libs'
+require_relative 'log-serve/models/log_file'
+require_relative 'log-serve/models/log_file_line'
+require_relative 'log-serve/models/log_directory'
+require_relative 'log-serve/models/log_file_merger'
 
 module LogServe
   
@@ -27,6 +24,7 @@ module LogServe
       set :sessions,
           :httponly => true,
           :expire_after => 31557600 # 1 year
+      set :root, File.dirname(__FILE__)+"/log-serve"
     end
 
     use Rack::Deflater

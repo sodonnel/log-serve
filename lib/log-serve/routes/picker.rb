@@ -2,7 +2,7 @@ module LogServe
   module Routes
     class Picker < Sinatra::Application
 
-      set :views, 'app/views'
+      set :views, File.expand_path('../../views', __FILE__)
 
       get '/picker' do
         erb :picker, :locals => { :directory => $log_directory }
