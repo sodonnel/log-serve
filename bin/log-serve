@@ -1,0 +1,17 @@
+#!/Users/sodonnell/.rvm/rubies/ruby-2.2.1/bin/ruby
+
+$:.unshift File.expand_path(File.dirname(__FILE__)+"/..")
+
+require 'rack'
+require 'app_new'
+
+# For a full list of options, see
+# http://www.ruby-doc.org/stdlib-1.9.3/libdoc/webrick/rdoc/WEBrick.html
+options = {
+  :Host => 'localhost',
+  :Port => '3000'
+}
+
+Rack::Handler::WEBrick.run(LogServe::App, options) do |server|
+  [:INT, :TERM].each { |sig| trap(sig) { server.stop } }
+end
