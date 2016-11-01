@@ -1,9 +1,9 @@
-#!/Users/sodonnell/.rvm/rubies/ruby-2.2.1/bin/ruby
+#!/usr/bin/env ruby
 
-$:.unshift File.expand_path(File.dirname(__FILE__)+"/..")
+$run_as_production = true
 
 require 'rack'
-require 'lib/log-serve'
+require 'log-serve'
 
 # For a full list of options, see
 # http://www.ruby-doc.org/stdlib-1.9.3/libdoc/webrick/rdoc/WEBrick.html

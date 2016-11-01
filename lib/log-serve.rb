@@ -1,6 +1,3 @@
-$:.unshift File.expand_path(File.dirname(__FILE__))
-$:.unshift File.expand_path(File.join(File.dirname(__FILE__), "../../log-merge", "lib"))
-
 require 'log-merge'
 
 require 'rubygems'
@@ -32,7 +29,11 @@ module LogServe
     use Routes::Picker
     use Routes::Viewer
 
-    $log_directory = LogServe::Models::LogDirectory.new('/Users/sodonnell/Desktop/logs').load_files
+    if $run_as_production
+      $log_directory = LogServe::Models::LogDirectory.new(Dir.pwd).load_files
+    else
+      $log_directory = LogServe::Models::LogDirectory.new('/Users/sodonnell/Desktop/logs').load_files
+    end
     $lines_per_request = 250
     $lines_maintained_in_viewer = 3 * $lines_per_request
   end
