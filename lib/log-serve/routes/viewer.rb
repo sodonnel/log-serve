@@ -24,8 +24,18 @@ module LogServe
                                                   :no_more_messages => @log_file.eof? }
       end
 
-      get '/file/:filekey/position/end' do
-        new_position = @log_file.eof_position
+      get '/file/:filekey/position/:position' do
+        new_position = params['position']
+        eof_position = @log_file.eof_position
+        
+        if new_position == 'end'
+          new_position = eof_position
+        else
+          new_position = new_position.to_i
+        end
+        new_position = eof_position if new_position > eof_position
+        new_position = 0 if new_position < 0
+        
         erb :reset, :layout => false, :locals => { :eof => true, :position => new_position }
       end
 
