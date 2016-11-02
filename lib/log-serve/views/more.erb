@@ -1,5 +1,4 @@
 $('#code').append('<%= escape_javascript(erb(:logline, :layout => false, :locals => { :lines => lines })) %>');
-$('#container').attr('data-infinite-scroll-position', '<%= log_position %>');
 <% if no_more_messages %>
   $('#container').attr('data-infinite-scroll-status', 'end-of-stream');
 <% else %>

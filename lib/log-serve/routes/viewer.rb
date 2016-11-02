@@ -20,7 +20,6 @@ module LogServe
         
         erb :more, :layout => false, :locals => { :lines => lines,
                                                   :max_lines => $lines_maintained_in_viewer,
-                                                  :log_position => @log_file.last_io_position.to_s,
                                                   :no_more_messages => @log_file.eof? }
       end
 
@@ -35,8 +34,20 @@ module LogServe
         end
         new_position = eof_position if new_position > eof_position
         new_position = 0 if new_position < 0
+
+        forward_lines = @log_file.read_lines_from_position($lines_per_request, new_position)
+        read_backwards_from = forward_lines.length > 0 ? forward_lines.first.start_file_position : new_position
         
-        erb :reset, :layout => false, :locals => { :eof => true, :position => new_position }
+        reverse_lines = @log_file.read_lines_backwards_from_position($lines_per_request,
+                                                                     read_backwards_from).reverse
+        
+        lines = reverse_lines + forward_lines
+
+        erb :viewer_position, :layout => false, :locals => { :lines => lines,
+                                                             :max_lines => $lines_maintained_in_viewer,
+                                                             :requested_position => new_position }
+        
+#        erb :reset, :layout => false, :locals => { :eof => true, :position => new_position }
       end
 
       get '/file/:filekey/less/?:position?' do
@@ -45,7 +56,6 @@ module LogServe
                     
           erb :previouslines, :layout => false, :locals => { :lines => lines,
                                                              :max_lines => $lines_maintained_in_viewer,
-                                                             :log_position => @log_file.last_io_position.to_s,
                                                              :no_more_messages => @log_file.eof? }
       end
 
