@@ -37,7 +37,8 @@ module LogServe
         
         erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                              :max_lines => $lines_maintained_in_viewer,
-                                                             :requested_position => loaded_position }
+                                                             :requested_position => loaded_position,
+                                                             :highlight_line => false}
       end
 
       get '/file/:filekey/less/?:position?' do
@@ -62,7 +63,8 @@ module LogServe
         
             erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                                  :max_lines => $lines_maintained_in_viewer,
-                                                                 :requested_position => loaded_position }
+                                                                 :requested_position => loaded_position,
+                                                                 :highlight_line => true}
           else
             "alert('The requested date #{date_string} is not in the logfile')"
           end
