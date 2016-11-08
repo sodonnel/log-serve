@@ -136,9 +136,24 @@ module LogServe
         middle_line = read_lines_backwards_from_position(1, middle).first
 
         if ((start_line.start_file_position == middle_line.start_file_position) || (end_line.start_file_position == middle_line.start_file_position))
-          # I don't think the condition on end_line is necessary. The algorithm should converge to two lines and then the middle
-          # will generally fallback to the start line, which should be the line before the time you are asking for.
-          return middle_line
+          
+          return_line = middle_line
+
+          # If we get to start_line == middle line, then we have narrowed the search to a small window, but it
+          # is possible to for the middle to equal the start when there are several lines after middle and hence
+          # it returns too early. Therefore scan any remaining lines between middle and end looking for the first
+          # one with a bigger dtm and then return the line just before it.
+          #
+          # It may even be more efficient to just scan forwards when end - start <= 0.5MB or so, as it would involve
+          # less seeks.
+          read_lines_from_position(-1, middle_line.start_file_position) { |l|
+            if l.timestamp > dtm
+              break
+            else
+              return_line = l
+            end
+          }
+          return return_line
         end
 
         if dtm <= middle_line.timestamp
