@@ -32,22 +32,12 @@ module LogServe
         else
           new_position = new_position.to_i
         end
-        new_position = eof_position if new_position > eof_position
-        new_position = 0 if new_position < 0
 
-        forward_lines = @log_file.read_lines_from_position($lines_per_request, new_position)
-        read_backwards_from = forward_lines.length > 0 ? forward_lines.first.start_file_position : new_position
+        lines, loaded_position = get_lines_centered_on_position(new_position)
         
-        reverse_lines = @log_file.read_lines_backwards_from_position($lines_per_request,
-                                                                     read_backwards_from).reverse
-        
-        lines = reverse_lines + forward_lines
-
         erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                              :max_lines => $lines_maintained_in_viewer,
-                                                             :requested_position => new_position }
-        
-#        erb :reset, :layout => false, :locals => { :eof => true, :position => new_position }
+                                                             :requested_position => loaded_position }
       end
 
       get '/file/:filekey/less/?:position?' do
@@ -59,22 +49,48 @@ module LogServe
                                                              :no_more_messages => @log_file.eof? }
       end
 
-      post '/gotodate/:filekey' do
+      # TODO - handle more date formats
+      # TODO - if there is a date parse error, return an error instead of a hard fail
+      post '/file/:filekey/date' do
         begin
           date_string = params['datetime']
-          warn date_string
-          log_file = $log_directory.find_file(params[:filekey])
-
           dtm = DateTime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
-          new_position = log_file.position_at_time(dtm)
-          warn new_position
-          #  pp $logfile_index.get_index_hash
-
-          erb :gotodate, :layout => false, :locals => { :new_position => new_position }
+          new_position = @log_file.position_at_time(dtm)
+          
+          if new_position
+            lines, loaded_position = get_lines_centered_on_position(new_position)
+        
+            erb :viewer_position, :layout => false, :locals => { :lines => lines,
+                                                                 :max_lines => $lines_maintained_in_viewer,
+                                                                 :requested_position => loaded_position }
+          else
+            "alert('The requested date #{date_string} is not in the logfile')"
+          end
         end
       end
 
       helpers LogServe::Helpers
+
+      private
+
+      def get_lines_centered_on_position(pos)
+        new_position = pos
+        eof_position = @log_file.eof_position
+        new_position = eof_position if new_position > eof_position
+        new_position = 0 if new_position < 0
+
+        forward_lines = @log_file.read_lines_from_position($lines_per_request, new_position)
+        read_backwards_from = forward_lines.length > 0 ? forward_lines.first.start_file_position : new_position
+        
+        reverse_lines = @log_file.read_lines_backwards_from_position($lines_per_request,
+                                                                     read_backwards_from).reverse
+        
+        lines = reverse_lines + forward_lines
+        # Return the array of lines and the position the requested pos was changed to
+        [lines, new_position]
+      end
+      
+      
     end
 
   end
