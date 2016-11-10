@@ -38,6 +38,17 @@ module LogServe
         end
       end
 
+      def position_for_match(start_pos, regex)
+        matching_line = nil
+        read_lines_from_position(-1, start_pos) do |line|
+          if regex.match line.raw_content
+            matching_line = line
+            break
+          end
+        end
+        matching_line.nil? ? nil : matching_line.start_file_position
+      end
+
       def position_at_time(dtm)
         start_line = read_lines_from_position(1, 0).first
         end_line   = read_lines_backwards_from_position(1, eof_position).first

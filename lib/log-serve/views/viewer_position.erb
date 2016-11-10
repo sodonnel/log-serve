@@ -1,3 +1,4 @@
 reset();
 $('#code').append('<%= escape_javascript(erb(:logline, :layout => false, :locals => { :lines => lines })) %>');
 scroll_to_position(<%= requested_position %>, <%= highlight_line %>);
+$('#container').attr('lastSetPosition', '<%= requested_position %>');

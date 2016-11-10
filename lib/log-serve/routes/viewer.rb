@@ -71,6 +71,24 @@ module LogServe
         end
       end
 
+      post '/file/:filekey/search' do
+        search_string = params['search']
+        start_position = params['position'].to_i
+
+        regexp = Regexp.new(search_string, Regexp::IGNORECASE | Regexp::MULTILINE)
+        new_position = @log_file.position_for_match(start_position, regexp)
+        if new_position
+            lines, loaded_position = get_lines_centered_on_position(new_position)
+        
+            erb :viewer_position, :layout => false, :locals => { :lines => lines,
+                                                                 :max_lines => $lines_maintained_in_viewer,
+                                                                 :requested_position => loaded_position,
+                                                                 :highlight_line => true}
+        else
+          "alert('The requested search #{search_string} is not in the logfile')"
+        end
+      end
+
       helpers LogServe::Helpers
 
       private

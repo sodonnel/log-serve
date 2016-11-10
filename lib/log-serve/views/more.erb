@@ -9,9 +9,15 @@ $('#code').append('<%= escape_javascript(erb(:logline, :layout => false, :locals
 if ( $('#code tr').size() > <%= max_lines %> ) {
   var oldHeight = $(document).height()
   $('#code tr').slice(0, 250).remove();
-  $('html, body').scrollTop($('html, body').scrollTop() + $(document).height() - oldHeight);
+
+  // This selector is needed as webkit (safari, chrome) needs body, firefox needs html,body
+  var scrollTopSelector = 'body';
+  if (window.mozInnerScreenX != null) {
+  // firefox
+    scrollTopSelector = 'html,body';
+  }
+  $(scrollTopSelector).scrollTop($(scrollTopSelector).scrollTop() + $(document).height() - oldHeight);
   $('#container').attr('data-infinite-scroll-earlier-status', 'ready');
-  $('#container').attr('data-infinite-scroll-earlier-position', $('#code tr').first().attr('sp'));
 }
 
 
