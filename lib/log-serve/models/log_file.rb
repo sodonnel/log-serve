@@ -38,17 +38,31 @@ module LogServe
         end
       end
 
+      # Testing on a 200MB file - converting each line to a log reader is takes about 12 - 15 seconds
+      # to search the file. Just doing a regex on each line searches it in about 2 - 3 seconds even
+      # with reading one line backwards to find the start position of the line.
       def position_for_match(start_pos, regex)
-        matching_line = nil
-        read_lines_from_position(-1, start_pos) do |line|
-          if regex.match line.raw_content
-            matching_line = line
-            break
+        begin
+          matching_line = nil
+          open(start_pos)
+          @fh.each_line do |line|
+            if regex.match line
+              matching_line = line
+              break
+            end
           end
+          if matching_line.nil?
+            nil
+          else
+            read_lines_backwards_from_position(1, @fh.pos).first.start_file_position
+          end
+        ensure
+          close
         end
-        matching_line.nil? ? nil : matching_line.start_file_position
       end
 
+
+      
       def position_at_time(dtm)
         start_line = read_lines_from_position(1, 0).first
         end_line   = read_lines_backwards_from_position(1, eof_position).first
