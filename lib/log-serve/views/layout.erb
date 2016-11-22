@@ -44,16 +44,17 @@
             <li><a id="endButton" href="#about">End</a></li>
 	    <li><a id="downButton" href="#about">Down</a></li>
 	    <li><a id="upButton" href="#about">Up</a></li>
+	    <li><a id="highlight" href="#about">H</a></li>
 
             <li><a href="#contact"></a></li>
             <li>
 	      <form class="navbar-form nav navbar-nav navbar-right" id="search">
                 <div class="form-group">
                   <label class="nav" for="datetime" style="color: #777; font-weight: normal;">Search: </label>
-                  <input type="datetime-local" size="19" class="form-control" id="search" name="search">
+                  <input size="19" class="form-control" id="search_string" name="search">
                 </div>
-                <button type="submit" class="btn btn-default">prev</button>
-	        <button type="submit" class="btn btn-default">next</button>
+                <input type="submit" value="prev" id="prev" class="btn btn-default">
+	        <input type="submit" value="next" id="next" class="btn btn-default">
 	    </form>
             </li>
           </ul>

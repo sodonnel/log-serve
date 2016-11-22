@@ -38,7 +38,8 @@ module LogServe
         erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                              :max_lines => $lines_maintained_in_viewer,
                                                              :requested_position => loaded_position,
-                                                             :highlight_line => false}
+                                                             :highlight_line => false,
+                                                             :center         => false}
       end
 
       get '/file/:filekey/less/?:position?' do
@@ -64,7 +65,8 @@ module LogServe
             erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                                  :max_lines => $lines_maintained_in_viewer,
                                                                  :requested_position => loaded_position,
-                                                                 :highlight_line => true}
+                                                                 :highlight_line => true,
+                                                                 :center         => false}
           else
             "alert('The requested date #{date_string} is not in the logfile')"
           end
@@ -72,6 +74,7 @@ module LogServe
       end
 
       post '/file/:filekey/search' do
+        puts params
         search_string = params['search']
         start_position = params['position'].to_i
 
@@ -83,7 +86,8 @@ module LogServe
             erb :viewer_position, :layout => false, :locals => { :lines => lines,
                                                                  :max_lines => $lines_maintained_in_viewer,
                                                                  :requested_position => loaded_position,
-                                                                 :highlight_line => true}
+                                                                 :highlight_line => true,
+                                                                 :center         => true}
         else
           "alert('The requested search #{search_string} is not in the logfile')"
         end
