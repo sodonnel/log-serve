@@ -41,11 +41,15 @@ module LogServe
       # Testing on a 200MB file - converting each line to a log reader is takes about 12 - 15 seconds
       # to search the file. Just doing a regex on each line searches it in about 2 - 3 seconds even
       # with reading one line backwards to find the start position of the line.
-      def position_for_match(start_pos, regex)
+      def position_for_match(start_pos, regex, forwards=true)
         begin
           matching_line = nil
           open(start_pos)
-          @fh.each_line do |line|
+          fr = @fh
+          if !forwards
+            fr = LogMerge::ReverseFileReader.new(@fh)
+          end
+          fr.each_line do |line|
             if regex.match line
               matching_line = line
               break
@@ -54,13 +58,21 @@ module LogServe
           if matching_line.nil?
             nil
           else
-            read_lines_backwards_from_position(1, @fh.pos).first.start_file_position
+            start_pos = fr.pos
+            if !forwards
+              # If searching backwards, if the match is found, in the file line that the log starts on, eg
+              # DATE LEVEL .... match ....
+              # Then the fh.pos will give the start of that line and reading backwards from there will give
+              # the previous line to the match. So we need to adjust the positing forwards by the line length
+              # and read back from there to find the correct line
+              start_pos += matching_line.length
+            end
+            read_lines_backwards_from_position(1, start_pos).first.start_file_position
           end
         ensure
           close
         end
       end
-
 
       
       def position_at_time(dtm)

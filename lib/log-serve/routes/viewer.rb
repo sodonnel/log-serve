@@ -74,12 +74,12 @@ module LogServe
       end
 
       post '/file/:filekey/search' do
-        puts params
         search_string = params['search']
         start_position = params['position'].to_i
+        direction = params['direction']
 
         regexp = Regexp.new(search_string, Regexp::IGNORECASE | Regexp::MULTILINE)
-        new_position = @log_file.position_for_match(start_position, regexp)
+        new_position = @log_file.position_for_match(start_position, regexp, direction == 'forward' ? true : false)
         if new_position
             lines, loaded_position = get_lines_centered_on_position(new_position)
         
