@@ -1,3 +1,14 @@
+/* Ajax loading indicator */
+#rc_notify{
+  position: absolute; right: 0px; top: 0px; 
+  display: none;
+  background-color: red; color: white; 
+  margin: 5px; padding: 3px; z-index: 99999;
+}
+span > div#rc_notify {
+  position: fixed;
+}
+
 .code-table {
     padding-left: 10px;
     font-size: 12px;
